@@ -7,7 +7,7 @@ object ToDoTypes {
   case class Item(title: String, description: String, deadline: LocalDate)
 
   sealed trait Urgency
-  case object Urgent
-  case object MaybeLater
-  case object NotImportant
+  case object Urgent       extends Urgency
+  case object MaybeLater   extends Urgency
+  case object NotImportant extends Urgency
 }
