@@ -2,7 +2,7 @@ package InMemoryStore
 
 import java.time.LocalDate
 
-import definitions.ToDoTypes.{Item, MaybeLater, ToDo}
+import definitions.ToDoTypes.{Item, MaybeLater, ToDo, Urgent}
 
 object ToDoList {
   val testInMemoryList: List[ToDo] = List(
@@ -12,4 +12,12 @@ object ToDoList {
       MaybeLater
     )
   )
+
+  val urgentToDo = ToDo(
+    Item("The house is on fire", "Leave but take your wallet, laptop and phone", LocalDate.now()),
+    LocalDate.now(),
+    Urgent
+  )
+
+  val testInMemoryListWithUrgent = testInMemoryList :+ urgentToDo
 }
