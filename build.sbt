@@ -10,6 +10,11 @@ scalacOptions ++= Seq("-target:jvm-1.8", "-unchecked", "-deprecation", "-feature
 
 mainClass in Compile := Some("Boot")
 
+mainClass in assembly := Some("Boot")
+
+enablePlugins(DockerPlugin)
+
+
 val akkaVersion = "2.5.23"
 val akkaHttpVersion = "10.1.8"
 val circeVersion = "0.11.1"
@@ -39,3 +44,15 @@ lazy val circe = Seq(
   "io.circe" %% "circe-parser"% circeVersion
 )
 
+dockerfile in docker := {
+  // The assembly task generates a fat JAR file
+  val artifact: File = assembly.value
+  val artifactTargetPath = s"/app/${artifact.name}"
+
+  new Dockerfile {
+    from("openjdk:8-jre")
+    add(artifact, artifactTargetPath)
+    entryPoint("java", "-jar", artifactTargetPath)
+    expose(7070)
+  }
+}
