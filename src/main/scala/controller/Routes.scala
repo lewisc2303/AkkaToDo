@@ -12,10 +12,17 @@ class Routes(todoReader: TodoReader) extends Directives {
         complete("pong")
       }
     } ~
-      path("todos") {
+      path("todos" / "all") {
         get {
           complete(
             Handler.handle(todoReader.getAllToDos)
+          )
+        }
+      } ~
+      path("todos" / "urgent") {
+        get {
+          complete(
+            Handler.handle(todoReader.getUrgentToDos)
           )
         }
       }
