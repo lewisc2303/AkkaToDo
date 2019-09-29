@@ -7,7 +7,11 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import definitions.ToDoTypes.ToDo
 import todoHandler.TodoReader
 
-class Routes(todoReader: TodoReader) extends Directives with ImplicitJsonConv {
+import scala.concurrent.ExecutionContext
+
+class Routes(todoReader: TodoReader, implicit val ec: ExecutionContext)
+    extends Directives
+    with ImplicitJsonConv {
 
   lazy val routes: Route =
     path("health") {
@@ -18,14 +22,7 @@ class Routes(todoReader: TodoReader) extends Directives with ImplicitJsonConv {
       path("todos" / "all") {
         get {
           complete(
-            Handler.handle(todoReader.getAllToDos)
-          )
-        }
-      } ~
-      path("todos" / "urgent") {
-        get {
-          complete(
-            Handler.handle(todoReader.getUrgentToDos)
+            todoReader.getAllToDos.map(x => Handler.handle(x))
           )
         }
       } ~
@@ -33,7 +30,7 @@ class Routes(todoReader: TodoReader) extends Directives with ImplicitJsonConv {
         post {
           entity(implicitly[FromRequestUnmarshaller[ToDo]]) { todo =>
             println(todo)
-            complete(StatusCodes.OK)
+            complete(StatusCodes.OK) //todo add validations for post request
           }
         }
       }
