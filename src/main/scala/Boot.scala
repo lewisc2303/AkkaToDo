@@ -18,7 +18,7 @@ object Boot extends App {
   val todoReader = new TodoReader(toDoSource)
   val router     = new Routes(todoReader)
   val routes     = router.routes
-  val binding    = Http().bindAndHandle(routes, "0.0.0.0", 7070)
+  val binding    = Http().bindAndHandle(routes, "0.0.0.0", 8080)
 
   binding.onComplete {
     case Success(bound) => println(s"Bound to: " + bound.localAddress)

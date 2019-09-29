@@ -12,14 +12,11 @@ mainClass in Compile := Some("Boot")
 
 mainClass in assembly := Some("Boot")
 
-enablePlugins(DockerPlugin)
-
-
 val akkaVersion = "2.5.23"
 val akkaHttpVersion = "10.1.8"
 val circeVersion = "0.11.1"
 
-libraryDependencies ++= scalaTest ++ akka ++ akkaHttpCirce ++ circe
+libraryDependencies ++= scalaTest ++ akka ++ akkaHttpCirce ++ circe ++ mySqlJDBC ++ mySql
 
 lazy val scalaTest = Seq(
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
@@ -44,15 +41,26 @@ lazy val circe = Seq(
   "io.circe" %% "circe-parser"% circeVersion
 )
 
+lazy val mySqlJDBC = Seq(
+  "org.scalikejdbc" %% "scalikejdbc"       % "3.3.5",
+  "org.scalikejdbc" %% "scalikejdbc-config"    % "3.3.5",
+  "com.h2database" % "h2" % "1.4.197", //todo won't build, but did build when in the vpn??? as it connected to the dev nexus. but why?
+  "ch.qos.logback"  %  "logback-classic"   % "1.2.3"
+)
+
+lazy val mySql = Seq("mysql" % "mysql-connector-java" % "5.1.12")
+
+enablePlugins(DockerPlugin)
+
 dockerfile in docker := {
   // The assembly task generates a fat JAR file
   val artifact: File = assembly.value
   val artifactTargetPath = s"/app/${artifact.name}"
 
   new Dockerfile {
-    from("openjdk:8-jre")
+    from("openjdk:jre-alpine")
     add(artifact, artifactTargetPath)
     entryPoint("java", "-jar", artifactTargetPath)
-    expose(7070)
+    expose(8080)
   }
 }
