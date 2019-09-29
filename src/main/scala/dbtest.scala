@@ -1,9 +1,9 @@
+import dbClient.MySqlConnector.toUrgency
+import definitions.ToDoTypes.{Item, ToDo}
 import scalikejdbc.{DB, _}
 import scalikejdbc.config.DBs
 
 object dbtest extends App {
-
-  Class.forName("com.mysql.jdbc.Driver")
 
   // DBs.setup/DBs.setupAll loads specified JDBC driver classes.
   DBs.setupAll()
@@ -11,7 +11,24 @@ object dbtest extends App {
   println("[DATABASE] Opening DB connection")
 
   val memberIds = DB readOnly { implicit session =>
-    sql"select id from ToDos".map(_.long(1)).list.apply()
+    sql"""SELECT name as name,
+            description as description,
+            dateCreated as dateCreated,
+            urgency as urgency,
+            deadline as deadline
+            FROM ToDos
+        """
+      .map { result =>
+        val name        = result.string("name")
+        val description = result.string("description")
+        val dateCreated = result.localDate("dateCreated")
+        val urgency     = result.string("urgency")
+        val deadline    = result.localDate("deadline")
+
+        ToDo(Item(name, description, deadline), dateCreated, toUrgency(urgency))
+      }
+      .list()
+      .apply
   }
   println(memberIds)
 
