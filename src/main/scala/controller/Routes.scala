@@ -3,9 +3,11 @@ package controller
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.unmarshalling.FromRequestUnmarshaller
+import controller.Handler.handle
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import definitions.ToDoTypes.ToDo
 import todoHandler.TodoReader
+import dbClient.MySqlConnector.persistToDo
 
 import scala.concurrent.ExecutionContext
 
@@ -22,14 +24,15 @@ class Routes(todoReader: TodoReader, implicit val ec: ExecutionContext)
       path("todos" / "all") {
         get {
           complete(
-            todoReader.getAllToDos.map(x => Handler.handle(x))
+            todoReader.getAllToDos.map(x => handle(x))
           )
         }
       } ~
       path("todos" / "create") {
         post {
           entity(implicitly[FromRequestUnmarshaller[ToDo]]) { todo =>
-            println(todo)
+            val createToDo = persistToDo(todo)
+            println("[DATABASE] persisted with generatted key : " + createToDo.toString)
             complete(StatusCodes.OK) //todo add validations for post request
           }
         }

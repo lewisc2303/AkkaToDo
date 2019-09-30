@@ -10,4 +10,4 @@ curl -d '{
     "urgency": {
       "MaybeLater": {}
     }
-  }' -H "Content-Type: application/json" -XPOST http://localhost:7070/todos/create
+  }' -H "Content-Type: application/json" -XPOST http://localhost:8080/todos/create

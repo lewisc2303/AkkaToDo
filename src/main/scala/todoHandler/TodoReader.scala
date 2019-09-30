@@ -1,18 +1,14 @@
 package todoHandler
 
-import definitions.ToDoTypes.{ToDo, Urgent}
+import definitions.ToDoTypes.ToDo
 
-class TodoReader(toDos: List[ToDo]) {
-  def getAllToDos: Either[String, List[ToDo]] = toDos match {
-    case Nil           => Left("No ToDo items could be found")
-    case nonEmptyToDos => Right(nonEmptyToDos)
-  }
+import scala.concurrent.{ExecutionContext, Future}
 
-  def getUrgentToDos: Either[String, List[ToDo]] = {
-    val urgentToDos = toDos.filter(todo => todo.urgency == Urgent)
-    urgentToDos match {
-      case Nil           => Left("No urgent ToDo items could be found")
+class TodoReader(toDos: Future[List[ToDo]], implicit val ec: ExecutionContext) {
+
+  def getAllToDos =
+    toDos.map {
+      case Nil           => Left("No ToDo items could be found")
       case nonEmptyToDos => Right(nonEmptyToDos)
     }
-  }
 }
